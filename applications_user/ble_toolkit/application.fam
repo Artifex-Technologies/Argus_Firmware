@@ -1,0 +1,11 @@
+App(
+    appid="ble_toolkit",
+    name="BLE Kit",
+    apptype=FlipperAppType.APP,
+    targets=["f7"],
+    entry_point="ble_toolkit_app",
+    stack_size=2 * 1024,
+    icon="A_BleToolkit_14",
+    order=71,
+    requires=["gui"],
+)

@@ -1,0 +1,11 @@
+App(
+    appid="rf_monitor",
+    name="RSSI",
+    apptype=FlipperAppType.APP,
+    targets=["f7"],
+    entry_point="rf_monitor_app",
+    stack_size=2 * 1024,
+    icon="A_RfMonitor_14",
+    order=35,
+    requires=["gui"],
+)

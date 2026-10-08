@@ -1,0 +1,11 @@
+App(
+    appid="mfkey",
+    name="MFKey",
+    apptype=FlipperAppType.APP,
+    targets=["f7"],
+    entry_point="mfkey_main",
+    stack_size=8 * 1024,
+    icon="A_Mfkey_14",
+    order=36,
+    requires=["gui"],
+)
