@@ -14,10 +14,10 @@ Custom [Flipper Zero](https://flipper.net) firmware, forked from the
 | **Argus Firmware** | this repo — runs on the Flipper Zero |
 | **Argus App** | desktop control app (qFlipper fork, Qt6) |
 | **Chymaera OS** | Arch-based security distro hosting the app and Sarina |
-| **Sarina** | local-model agent shipped in Chymaera Linux |
+| **Sarina** | local-model agent shipped in Chymaera OS |
 
 The device stays fully usable from **stock qFlipper** — that is a hard
-requirement. Chymaera Zero App is the primary client and adds capability on
+requirement. Argus App is the primary client and adds capability on
 top, but the official flash and update paths must keep working.
 
 ## Goals
@@ -47,7 +47,7 @@ Via external hardware, using plumbing that already exists upstream:
 
 ### Streaming
 
-Telemetry is intended to reach Chymaera Linux over **Bluetooth**. The RPC
+Telemetry is intended to reach Chymaera OS over **Bluetooth**. The RPC
 layer is transport-agnostic, so the same protobuf session runs over USB or
 BLE. The BLE serial link tops out somewhere around **5–30 KB/s**, which is
 the governing design constraint: the device emits decoded events and decimated
@@ -109,7 +109,7 @@ Release artifacts land in `dist/f7-C/`, debug in `dist/f7-D/`.
 
 ## Installing
 
-**Via the desktop app** — in qFlipper (or Chymaera Zero App), choose
+**Via the desktop app** — in qFlipper (or Argus App), choose
 *Install from file* and select
 `dist/f7-C/flipper-z-f7-update-<suffix>.tgz`.
 
@@ -134,7 +134,7 @@ With the desktop app closed, over the serial console:
 device_info
 ```
 
-`firmware_origin_fork: Chymaera` distinguishes this from stock firmware.
+`firmware_origin_fork: Argus` distinguishes this from stock firmware.
 
 ## Staying in sync with upstream
 
