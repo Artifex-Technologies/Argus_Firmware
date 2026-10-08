@@ -126,7 +126,7 @@ on the card and run it from the Flipper's file browser.
 
 **With an in-circuit debugger** — `./fbt flash`.
 
-## Verifying a Chymaera build
+## Verifying an Argus build
 
 With the desktop app closed, over the serial console:
 
@@ -160,7 +160,7 @@ git merge upstream/dev
 ## Project structure
 
 - `applications`        - Applications and services used in firmware
-- `applications_user`   - Chymaera applications live here
+- `applications_user`   - Argus applications live here
 - `assets`              - Assets used by applications and services
 - `documentation`       - Documentation generation system configs and input files
 - `furi`                - Furi Core: OS-level primitives and helpers
