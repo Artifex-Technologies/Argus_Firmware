@@ -1,0 +1,7 @@
+# Upstream treats this directory as an untracked personal sandbox (a blanket
+# "*" here). Argus treats it as the tracked home for first-party apps
+# instead - see CLAUDE.md "Where first-party code lives" - so only ignore
+# actual build/editor junk, not the apps themselves.
+__pycache__/
+*.pyc
+.vscode/
