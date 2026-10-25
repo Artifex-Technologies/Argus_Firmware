@@ -51,6 +51,43 @@ commit** rather than folding it into a larger change, so it can be re-applied
 or dropped independently. The Qt fix in `Argus_App` (`d8dd8d4`) is the
 pattern: one concern, one commit, explains *why*.
 
+### The flash budget, and SD-card apps built from this repo
+
+"Capability in the image" has a hard physical limit. Measured 2026-10-24:
+the firmware is ~816 KB and the BLE copro stack starts at `0x080D7000`
+(860 KB), so **real headroom is only ~44 KB**. The build's `.free_flash`
+figure (~227 KB) ignores the copro region and overstates it. That is room
+for one or two more mid-size built-in apps, not a toolset.
+
+So the bulk of capability ships as **`EXTERNAL` apps (FAPs) built from this
+repo**, not loaded ad hoc. fbt files them under `/ext/apps/<fap_category>/`
+in the update package's resources, and `flash_usb_full` or qFlipper
+installs them with every update. Because they are built against this tree's
+SDK, they always match the firmware's API. Keep the API identical to the
+stock release, so the official catalog and the iOS app keep working
+alongside them.
+
+Rules for importing third-party apps from the fork firmwares:
+- **Defensive, analysis and own-device tools only.** No jammers, BLE spam
+  or crash payloads, Wi-Fi deauth or captive portals, brute-forcers, relay
+  attacks, fuzzers, or mousejacking. That is the same line BLE Kit draws.
+  Bulk imports of attack-adjacent tooling were tried and abandoned
+  (2026-10-24). Work in small, clearly defensive batches.
+- **Check before importing:** licence (MIT/BSD/GPL-compatible; keep the
+  notice), that it does not transmit if it claims to be passive, and that
+  every symbol the `.fap` imports is in `targets/f7/api_symbols.csv` (`nm -u`
+  against the `+` entries).
+- **Commit the authors' code unmodified first, then Argus fixes as a
+  separate commit,** so our changes stay reviewable and re-appliable when
+  the upstream app updates. Record the source repo, commit and licence in
+  the import commit.
+- Where two forks carry the same kind of app, take the most stable one as
+  the base and fold in the useful features from the others. Do not ship
+  duplicates.
+
+Imported so far, under `applications_user/`: `subghz_jammer_detect`,
+`cerberus`, `nfc_canary`, `specter` (passive detectors, MIT).
+
 ## The main menu
 
 The Argus main menu is a Wii-style 3x2 tile grid, implemented in

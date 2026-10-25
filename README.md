@@ -84,6 +84,18 @@ enclave.valid        : true
 | Main menu | **Radar** | Display for an HLK-LD2450 mmWave sensor: up to 3 people as dots with trails, a target list, and 3 m / 6 m zoom. Has a demo mode that runs without the sensor, and logs CSV to `/ext/ld2450/`. |
 | GPIO → | **Wi-Fi Scanner (ESP32)** | Lists nearby networks through the Marauder devboard: signal, channel, encrypted or open, and connected devices. Passive. Logs CSV to `/ext/wifi_scan/`. |
 
+Also included, installed to the SD card with each update (**Apps** menu):
+
+| Folder | App | What it does |
+| --- | --- | --- |
+| Apps → Sub-GHz | **Sub-GHz Jammer Detect** | Watches 315/433/868/915 MHz and alerts on a sustained carrier (jamming) |
+| Apps → Sub-GHz | **Cerberus** | Passive RF watchdog: flags jamming, burst floods and replay-like repetition |
+| Apps → NFC | **NFC Canary** | Alarms when a reader energises the Flipper (skimming detection) |
+| Apps → NFC | **Specter** | 13.56 MHz bug sweep: senses active NFC fields nearby |
+
+All four only listen, and they are MIT-licensed by their authors (credited in
+each app's folder).
+
 The NFC system dictionary is also extended to 4,479 MIFARE Classic keys
 (the union of Unleashed's and Momentum's), so more cards dump completely and
 emulate.
