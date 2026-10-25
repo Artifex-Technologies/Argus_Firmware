@@ -13,13 +13,13 @@ class GitVersion:
 
     # The upstream release this fork currently tracks. It cannot be derived
     # from git: Flipper cuts releases on a separate branch, so release tags
-    # like "1.4.3" are not ancestors of `dev` and `git describe` would report
+    # like "1.5.1" are not ancestors of `dev` and `git describe` would report
     # an ancient 0.x-rc tag instead. Update this when merging upstream.
-    UPSTREAM_VERSION = "1.4.3"
+    UPSTREAM_VERSION = "1.5.1"
 
-    # Our own releases are tagged "ARG-<upstream>r<N>", e.g. "ARG-1.4.3r1".
+    # Our own releases are tagged "ARG-<upstream>r<N>", e.g. "ARG-1.5.1r1".
     # N counts our revisions of that upstream release and restarts at 1 when
-    # UPSTREAM_VERSION changes (ARG-1.4.3r2 -> ARG-1.4.4r1).
+    # UPSTREAM_VERSION changes (ARG-1.5.1r2 -> ARG-1.5.2r1).
     TAG_PREFIX = "ARG-"
 
     def __init__(self, source_dir):
@@ -32,7 +32,7 @@ class GitVersion:
             return ""
 
     def _get_version(self):
-        """Compose a short version of the form ARG-1.4.3r1.
+        """Compose a short version of the form ARG-1.5.1r1.
 
         Naming the upstream release this was built from is more useful on a
         128px screen than a commit hash. Every build of a revision reports

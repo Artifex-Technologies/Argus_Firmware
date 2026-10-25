@@ -66,7 +66,7 @@ session outright rather than degrading silently.
 Builds cleanly and installs through qFlipper. Verified on hardware:
 
 ```
-firmware.version     : ARG-1.4.3r1
+firmware.version     : ARG-1.5.1r1
 firmware.origin.fork : Argus
 firmware.api         : 88.2      (same as upstream, so official catalog apps install)
 radio.alive          : true
@@ -171,10 +171,10 @@ info device
 
 ### Version numbers
 
-`ARG-1.4.3r1` reads as **ARG**, then the upstream Flipper release this is
-based on (**1.4.3**), then our revision of it (**r1**). A revision keeps its
-name while it is being worked on: every build reads `ARG-1.4.3r1` until `r2`
-is tagged. A new upstream release restarts at `r1` (`ARG-1.4.4r1`). To tell
+`ARG-1.5.1r1` reads as **ARG**, then the upstream Flipper release this is
+based on (**1.5.1**), then our revision of it (**r1**). A revision keeps its
+name while it is being worked on: every build reads `ARG-1.5.1r1` until `r2`
+is tagged. A new upstream release restarts at `r1` (`ARG-1.5.2r1`). To tell
 two builds of the same revision apart, use `firmware.commit.hash`.
 
 ## Staying in sync with upstream
@@ -185,9 +185,12 @@ Devices' repositories.
 ```shell
 git remote add upstream https://github.com/flipperdevices/flipperzero-firmware.git
 git remote set-url --push upstream no_push
-git fetch upstream
-git merge upstream/dev
+git fetch upstream --tags
+git merge 1.5.1          # merge official release tags, not upstream/dev
 ```
+
+Merging release tags keeps the firmware API identical to the stock release,
+so apps from the official catalog keep installing.
 
 This repository's own history was restarted. Upstream's fork point
 (`7f0b6e1c`) is recorded as an ancestor, so merges are ordinary three-way

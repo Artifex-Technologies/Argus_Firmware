@@ -145,9 +145,17 @@ visibly half-applied.
 Do not push to flipperdevices repos — this is a private fork.
 
 ```bash
-git fetch upstream
-git merge upstream/dev     # or rebase; merge keeps the history honest
+git fetch upstream --tags
+git merge <release tag>    # e.g. 1.5.1. Merge, don't rebase: it keeps the history honest
 ```
+
+**Merge upstream *release tags*, not `upstream/dev`.** Decided 2026-10-24
+when 1.5.1 came out. Official catalog apps are built against the release's
+API version (`Version` in `targets/f7/api_symbols.csv`), and `dev` runs
+ahead of it: at the time, 1.5.1 was API 88.2 and `dev` was already 88.4.
+Tracking releases keeps the API identical to stock, so catalog apps install,
+and makes `UPSTREAM_VERSION` literally true. Releases fork from `dev`, so
+release-to-release merges stay three-way. 1.5.1 merged with zero conflicts.
 
 ### Ecosystem survey: what the reference firmwares actually add
 
@@ -433,7 +441,7 @@ The Flipper Build Tool (`fbt`) downloads its own ARM toolchain on first run.
 ```bash
 ./fbt                        # firmware (debug by default)
 ./fbt updater_package        # full update package for qFlipper / SD self-update
-./fbt COMPACT=1 DEBUG=0 DIST_SUFFIX=ARG-1.4.3r1 updater_package    # release build
+./fbt COMPACT=1 DEBUG=0 DIST_SUFFIX=ARG-1.5.1r1 updater_package    # release build
 ./fbt flash_usb              # build + push over USB, device self-updates
 ./fbt flash_usb_full         # same, including resources/assets
 ```
@@ -448,7 +456,7 @@ The original repository contained sensitive data, so it was deleted and
 re-created without history (2026-10). To keep upstream merges working,
 upstream's fork point `7f0b6e1c` (2026-09-04) was then recorded as an
 ancestor with a `-s ours` merge (`3f3a3d1b`). That brings in only upstream's
-public history, and `git merge upstream/dev` is an ordinary three-way merge
+public history, and upstream merges are ordinary three-way merges
 again (a trial merge of 16 upstream commits had zero conflicts). Two
 consequences:
 
@@ -480,7 +488,7 @@ from deep inside SCons, not a message about git.
 `no_push` is filtered out there. Check `device_info` after changing remotes.
 
 **The version string is composed, and one half of it is hardcoded.**
-`firmware_version` reads `ARG-1.4.3r1`: the upstream release being
+`firmware_version` reads `ARG-1.5.1r1`: the upstream release being
 tracked, then our revision (`r1`, `r2`, ...). **There is no `+N` suffix, by
 the maintainer's decision (2026-10-24).** A revision under development is
 still that revision, so every build of r1 reads `r1` until `r2` is tagged.
@@ -488,10 +496,10 @@ Use `firmware.commit.hash` to tell builds apart.
 
 The upstream half is the constant `GitVersion.UPSTREAM_VERSION` in
 `scripts/version.py` and **must be updated by hand when merging upstream**. It
-cannot be derived: Flipper cuts releases on a separate branch, so `1.4.3` is
-not an ancestor of `dev` (261 commits in it are absent from ours) and
+cannot be derived: Flipper cuts releases on a separate branch, so release tags
+are not ancestors of `dev` (1.4.3 had 261 commits absent from it) and
 `git describe` would report an ancient `0.30.0-rc` instead. Our half comes
-from the nearest `ARG-<upstream>r*` tag, so tag releases. A new upstream release restarts at `r1` (`ARG-1.4.4r1`).
+from the nearest `ARG-<upstream>r*` tag, so tag releases. A new upstream release restarts at `r1` (`ARG-1.5.2r1`).
 
 The commit hash is deliberately *not* in the version string — `device_info`
 reports `firmware_commit` separately, and a 128px screen has better uses for
