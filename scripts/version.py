@@ -31,32 +31,17 @@ class GitVersion:
         except subprocess.CalledProcessError:
             return ""
 
-    def _commits_since(self, ref):
-        try:
-            # --first-parent: count our commits only. Since the upstream fork
-            # point was grafted in as an ancestor, a plain count would include
-            # every upstream commit (ARG-1.4.3r1+2789 instead of +4).
-            return int(self._exec_git(f"rev-list --count --first-parent {ref}..HEAD"))
-        except (subprocess.CalledProcessError, ValueError):
-            return 0
-
     def _get_version(self):
         """Compose a short version of the form ARG-1.4.3r1.
 
         Naming the upstream release this was built from is more useful on a
-        128px screen than a commit hash, and device_info reports the exact
-        commit in its own field anyway. A development build adds "+N" for
-        commits since our last tag.
+        128px screen than a commit hash. Every build of a revision reports
+        that revision: r1 stays "r1" while it is being worked on, with no
+        "+N" suffix. The exact build is in firmware.commit.hash.
         """
         base = f"{self.TAG_PREFIX}{self.UPSTREAM_VERSION}"
         ours = self._nearest_tag(f"{base}r*")
-        if not ours:
-            return f"{base}-dev"
-
-        ahead = self._commits_since(ours)
-        suffix = f"+{ahead}" if ahead else ""
-
-        return f"{ours}{suffix}"
+        return ours or f"{base}-dev"
 
     def get_version_info(self):
         commit = (

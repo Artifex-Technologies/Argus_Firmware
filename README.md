@@ -66,7 +66,7 @@ session outright rather than degrading silently.
 Builds cleanly and installs through qFlipper. Verified on hardware:
 
 ```
-firmware.version     : ARG-1.4.3r1+8     (development build; see "Version numbers")
+firmware.version     : ARG-1.4.3r1
 firmware.origin.fork : Argus
 firmware.api         : 88.2      (same as upstream, so official catalog apps install)
 radio.alive          : true
@@ -172,10 +172,10 @@ info device
 ### Version numbers
 
 `ARG-1.4.3r1` reads as **ARG**, then the upstream Flipper release this is
-based on (**1.4.3**), then our revision of it (**r1**). A development build
-adds `+N` for the commits since the last `ARG-*r*` tag. A new upstream release
-restarts at `r1` (`ARG-1.4.4r1`). The exact commit is reported separately as
-`firmware.commit.hash`.
+based on (**1.4.3**), then our revision of it (**r1**). A revision keeps its
+name while it is being worked on: every build reads `ARG-1.4.3r1` until `r2`
+is tagged. A new upstream release restarts at `r1` (`ARG-1.4.4r1`). To tell
+two builds of the same revision apart, use `firmware.commit.hash`.
 
 ## Staying in sync with upstream
 

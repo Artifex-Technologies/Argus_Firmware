@@ -453,8 +453,9 @@ again (a trial merge of 16 upstream commits had zero conflicts). Two
 consequences:
 
 - `git log` shows ~2,800 upstream commits. Use `--first-parent` to see ours.
-- Anything that counts commits must use `--first-parent`, which is why the
-  version's `+N` in `scripts/version.py` does.
+- Anything that counts our commits must use `--first-parent`, or it will
+  count upstream's too. (The version string used to append such a count and
+  briefly showed `+2789`. It no longer counts commits at all; see below.)
 
 **`applications_user/.gitignore` used to blanket-ignore everything.**
 Upstream ships it as `*`, treating the directory as an untracked personal
@@ -479,8 +480,11 @@ from deep inside SCons, not a message about git.
 `no_push` is filtered out there. Check `device_info` after changing remotes.
 
 **The version string is composed, and one half of it is hardcoded.**
-`firmware_version` reads `ARG-1.4.3r1` — the upstream release being
-tracked, then our revision (`r1`, `r2`, ...), then `+N` commits on a development build.
+`firmware_version` reads `ARG-1.4.3r1`: the upstream release being
+tracked, then our revision (`r1`, `r2`, ...). **There is no `+N` suffix, by
+the maintainer's decision (2026-10-24).** A revision under development is
+still that revision, so every build of r1 reads `r1` until `r2` is tagged.
+Use `firmware.commit.hash` to tell builds apart.
 
 The upstream half is the constant `GitVersion.UPSTREAM_VERSION` in
 `scripts/version.py` and **must be updated by hand when merging upstream**. It
