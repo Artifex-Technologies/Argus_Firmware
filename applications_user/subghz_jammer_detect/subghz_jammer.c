@@ -286,6 +286,7 @@ static JammerApp* jammer_app_alloc(void) {
     for(uint8_t i = 0; i < MONITOR_FREQ_COUNT; i++) {
         app->state->rssi[i] = -110.0f;
         app->state->window_max[i] = -110.0f;
+        app->state->window_min[i] = -110.0f;
         for(uint8_t j = 0; j < RSSI_WINDOW_SIZE; j++) {
             app->state->rssi_window[i][j] = -110.0f;
         }

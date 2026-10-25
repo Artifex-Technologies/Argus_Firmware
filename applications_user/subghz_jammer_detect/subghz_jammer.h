@@ -57,6 +57,7 @@ typedef struct {
     float rssi_window[MONITOR_FREQ_COUNT][RSSI_WINDOW_SIZE];
     uint8_t window_pos[MONITOR_FREQ_COUNT];
     float window_max[MONITOR_FREQ_COUNT];
+    float window_min[MONITOR_FREQ_COUNT]; /* sustained floor, used for detection */
     /* Consecutive alert cycle counter per frequency */
     uint8_t consecutive[MONITOR_FREQ_COUNT];
     /* Derived status */

@@ -1,5 +1,7 @@
-/* subghz_jammer_worker.c — Background worker thread for Sub-GHz Jammer.
- * Manages CC1101 TX state and continuous carrier transmission. */
+/* subghz_jammer_worker.c — Background worker thread for Sub-GHz Jammer Detect.
+ * Receive-only: steps the internal CC1101 across the monitored bands and
+ * samples RSSI. Nothing here transmits. (Argus: corrected a stale comment
+ * that described TX, left over from the app this was adapted from.) */
 
 #include "subghz_jammer_worker.h"
 #include "subghz_jammer.h"
@@ -32,12 +34,16 @@ static void window_push(JammerState* s, uint8_t idx, float rssi) {
     s->rssi_window[idx][pos] = rssi;
     s->window_pos[idx] = (pos + 1) % RSSI_WINDOW_SIZE;
 
-    /* Recompute max over the whole window */
+    /* Recompute max (peak, for display) and min (sustained floor, for
+     * detection) over the whole window. */
     float max = s->rssi_window[idx][0];
+    float min = s->rssi_window[idx][0];
     for(uint8_t i = 1; i < RSSI_WINDOW_SIZE; i++) {
         if(s->rssi_window[idx][i] > max) max = s->rssi_window[idx][i];
+        if(s->rssi_window[idx][i] < min) min = s->rssi_window[idx][i];
     }
     s->window_max[idx] = max;
+    s->window_min[idx] = min;
 }
 
 /* ── Worker thread ── */
@@ -103,13 +109,18 @@ static int32_t jammer_worker_thread(void* context) {
                 s->rssi[i] = rssi;
                 window_push(s, i, rssi);
 
-                /* Apply detection thresholds to rolling max */
-                float max = s->window_max[i];
+                /* Apply detection thresholds to the rolling *minimum*.
+                 * Argus fix: this used the rolling max, so one strong burst
+                 * (a key fob press nearby) held the window high for ~6 s and
+                 * passed the consecutive-cycle check, raising a false jammer
+                 * alert. A jammer is a sustained carrier: every sample in the
+                 * window must clear the threshold. */
+                float level = s->window_min[i];
                 FreqStatus prev_status = s->status[i];
 
-                if(max >= s->threshold_jammer) {
+                if(level >= s->threshold_jammer) {
                     s->status[i] = FreqStatusJammer;
-                } else if(max >= s->threshold_suspicious) {
+                } else if(level >= s->threshold_suspicious) {
                     s->status[i] = FreqStatusSuspicious;
                 } else {
                     s->status[i] = FreqStatusOk;

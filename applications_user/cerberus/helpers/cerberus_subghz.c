@@ -51,7 +51,15 @@ static int32_t cerberus_subghz_thread(void* context) {
     // --- Bring the internal CC1101 up in a wide OOK receive mode ---
     subghz_devices_init();
     const SubGhzDevice* device = subghz_devices_get_by_name(SUBGHZ_DEVICE_CC1101_INT_NAME);
-    subghz_devices_begin(device);
+    // Argus fix: the result of begin() was ignored, so a radio that failed
+    // to start was driven anyway. Bail out cleanly instead; the UI then
+    // simply shows no readings.
+    if(!device || !subghz_devices_begin(device)) {
+        FURI_LOG_E("Cerberus", "Sub-GHz radio failed to start");
+        if(device) subghz_devices_end(device);
+        subghz_devices_deinit();
+        return -1;
+    }
     subghz_devices_reset(device);
     subghz_devices_load_preset(device, FuriHalSubGhzPresetOok650Async, NULL);
 
