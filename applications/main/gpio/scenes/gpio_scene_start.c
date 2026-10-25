@@ -2,11 +2,13 @@
 #include <furi_hal_power.h>
 #include <furi_hal_usb.h>
 #include <dolphin/dolphin.h>
+#include <loader/loader.h>
 
 enum GpioItem {
     GpioItemUsbUart,
     GpioItemTest,
     GpioItemOtg,
+    GpioItemWifiScanner, // Argus
 };
 
 enum GpioOtg {
@@ -27,6 +29,15 @@ static void gpio_scene_start_var_list_enter_callback(void* context, uint32_t ind
         view_dispatcher_send_custom_event(app->view_dispatcher, GpioStartEventManualControl);
     } else if(index == GpioItemUsbUart) {
         view_dispatcher_send_custom_event(app->view_dispatcher, GpioStartEventUsbUart);
+    } else if(index == GpioItemWifiScanner) {
+        // Argus: hand over to the built-in Wi-Fi Scanner (an app of its own,
+        // since it needs the UART this app's bridge uses), then come back
+        // here when it exits.
+        Loader* loader = furi_record_open(RECORD_LOADER);
+        loader_enqueue_launch(loader, "wifi_scanner", NULL, LoaderDeferredLaunchFlagGui);
+        loader_enqueue_launch(loader, "gpio", NULL, LoaderDeferredLaunchFlagNone);
+        furi_record_close(RECORD_LOADER);
+        view_dispatcher_stop(app->view_dispatcher);
     }
 }
 
@@ -67,6 +78,9 @@ void gpio_scene_start_on_enter(void* context) {
         variable_item_set_current_value_index(item, GpioOtgOff);
         variable_item_set_current_value_text(item, gpio_otg_text[GpioOtgOff]);
     }
+
+    // Argus: must stay last, matching GpioItemWifiScanner's position.
+    variable_item_list_add(var_item_list, "Wi-Fi Scanner (ESP32)", 0, NULL, NULL);
 
     variable_item_list_set_selected_item(
         var_item_list, scene_manager_get_scene_state(app->scene_manager, GpioSceneStart));
