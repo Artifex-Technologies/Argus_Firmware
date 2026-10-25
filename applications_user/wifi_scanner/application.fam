@@ -1,0 +1,14 @@
+App(
+    appid="wifi_scanner",
+    name="Wi-Fi Scanner",
+    # SYSTEM: built into the image and launchable by name, but without a
+    # main-menu tile of its own. It is reached from GPIO > Wi-Fi Scanner.
+    apptype=FlipperAppType.SYSTEM,
+    targets=["f7"],
+    entry_point="wifi_scanner_app",
+    stack_size=2 * 1024,
+    requires=["gui"],
+    # Listed explicitly: the default glob is recursive and would pull in
+    # test/test_marauder_proto.c, which has its own main().
+    sources=["marauder_proto.c", "wifi_scanner.c"],
+)

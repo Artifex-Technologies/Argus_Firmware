@@ -69,6 +69,8 @@ FIRMWARE_APPS = {
         "system_apps",
         # Radio device drivers (external CC1101 plugin)
         "radio_device_cc1101_ext",
+        # Argus apps without a main-menu tile (launched from inside others)
+        "wifi_scanner",
         # Settings
         "settings_apps",
     ],
