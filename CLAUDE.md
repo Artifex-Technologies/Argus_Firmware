@@ -443,6 +443,19 @@ what qFlipper's "Install from file" accepts.
 
 ## Things that will bite you
 
+**This repo's history was restarted on purpose. Never try to recover it.**
+The original repository contained sensitive data, so it was deleted and
+re-created without history (2026-10). To keep upstream merges working,
+upstream's fork point `7f0b6e1c` (2026-09-04) was then recorded as an
+ancestor with a `-s ours` merge (`3f3a3d1b`). That brings in only upstream's
+public history, and `git merge upstream/dev` is an ordinary three-way merge
+again (a trial merge of 16 upstream commits had zero conflicts). Two
+consequences:
+
+- `git log` shows ~2,800 upstream commits. Use `--first-parent` to see ours.
+- Anything that counts commits must use `--first-parent`, which is why the
+  version's `+N` in `scripts/version.py` does.
+
 **`applications_user/.gitignore` used to blanket-ignore everything.**
 Upstream ships it as `*`, treating the directory as an untracked personal
 sandbox — the opposite of the tracked, first-party-code role it has here (see
