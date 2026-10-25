@@ -220,6 +220,27 @@ module's own scan output — is the additive way to build this, matching the
 same shape already used for external sub-GHz and planned for the WiFi/nRF24
 paths.
 
+## Radar: locating people with an LD2450
+
+`applications_user/ld2450_radar/` drives an **HLK-LD2450** 24 GHz mmWave
+radar over GPIO UART. It shows up to three tracked targets with X/Y position
+and speed across a ~120° cone out to ~6 m. That makes it the answer to "show
+where someone is", which nothing inside the Flipper can do.
+
+**Why not Wi-Fi sensing (CSI).** This was evaluated and rejected
+(2026-10-24). A single ESP32 link (board ↔ router) can sense presence,
+motion and breathing, but it has one antenna and one path, so it cannot give
+a bearing or a distance. A radar view built on it would be invented data.
+Real Wi-Fi localisation needs several ESP32 nodes doing radio tomography:
+coarse, calibration-heavy, and only worth it if through-wall sensing becomes
+a requirement.
+
+The protocol driver (`ld2450.c/.h`) is pure C with no Furi dependencies and
+is host-tested. Reuse it rather than re-parsing the protocol in another app.
+The sensor can sit on LPUART (pins 15/16), leaving USART (13/14) for the
+Wi-Fi devboard. The sensor ships with its own BLE enabled and open to the
+vendor's phone app; the app can switch that off.
+
 ## Hardware reality — what the device does not have
 
 Capability requests need to be checked against the silicon before being

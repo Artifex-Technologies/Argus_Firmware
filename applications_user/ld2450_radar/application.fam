@@ -1,0 +1,14 @@
+App(
+    appid="ld2450_radar",
+    name="Radar",
+    apptype=FlipperAppType.APP,
+    targets=["f7"],
+    entry_point="ld2450_radar_app",
+    stack_size=2 * 1024,
+    icon="A_Radar_14",
+    order=37,
+    requires=["gui"],
+    # Listed explicitly: the default glob is recursive and would pull in
+    # test/test_ld2450.c, which has its own main().
+    sources=["ld2450.c", "ld2450_radar.c"],
+)

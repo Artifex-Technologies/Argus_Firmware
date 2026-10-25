@@ -12,6 +12,7 @@ App(
         "bad_usb",
         "ble_toolkit",
         "rf_monitor",
+        "ld2450_radar",
         "mfkey",
         "u2f",
         "archive",
