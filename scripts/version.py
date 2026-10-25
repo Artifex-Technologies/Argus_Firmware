@@ -33,7 +33,10 @@ class GitVersion:
 
     def _commits_since(self, ref):
         try:
-            return int(self._exec_git(f"rev-list --count {ref}..HEAD"))
+            # --first-parent: count our commits only. Since the upstream fork
+            # point was grafted in as an ancestor, a plain count would include
+            # every upstream commit (ARG-1.4.3r1+2789 instead of +4).
+            return int(self._exec_git(f"rev-list --count --first-parent {ref}..HEAD"))
         except (subprocess.CalledProcessError, ValueError):
             return 0
 
