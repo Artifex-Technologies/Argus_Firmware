@@ -1,8 +1,9 @@
 name: 'Post-release hooks'
 
+# Manual only (2026-11-07): this is Flipper's CI, written for Flipper's own build machines (self-hosted runners) and
+# images we do not have, so on our account every automatic run failed. Start it from Actions > Run workflow.
 on:
-  release:
-    types: [prereleased, released]
+  workflow_dispatch:
 
 jobs:
   reindex:
