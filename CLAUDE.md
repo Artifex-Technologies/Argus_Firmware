@@ -12,14 +12,19 @@ Add to *this* file only when a decision should outlive the current task.
 
 Argus Firmware is custom firmware for the **Flipper Zero**, forked from
 the official [flipperzero-firmware](https://github.com/flipperdevices/flipperzero-firmware)
-`dev` branch. It is one of four repos in the Chymaera ecosystem:
+`dev` branch and now tracking its release tags. It is part of the Artifex
+ecosystem (called Chymaera in older notes below):
 
 | Repo | Role |
 | --- | --- |
 | `Argus_Firmware` | this repo — runs on the Flipper hardware |
 | `Argus_App` | fork of qFlipper; the desktop control app (Qt6/QML) |
-| `Chymaera_OS` | Arch-based security distro that hosts the app and Sarina |
-| `Sarina` | local-model agent (Python) shipped in Chymaera OS |
+| `LykanOS` | Arch-based security distro that hosts the app and Sarina (was Chymaera OS) |
+| `Sarina` | local-model agent (Python) |
+
+The repo is public and has outside users since 2026-11: releases are on
+GitHub (see "Releases and CI" below). Never put a host name, network
+address, serial number or other personal detail in commits or docs.
 
 The device must stay usable from **stock qFlipper** — that is a hard
 requirement, not a nice-to-have. Argus App is the primary client and
@@ -119,8 +124,8 @@ arithmetic would otherwise underflow `size_t`.
 
 ## Porting from the reference firmwares
 
-Unleashed, Momentum and RogueMaster are kept in `ref-ChyZero\Firmware` as
-reference. **Port deliberately, feature by feature — do not bulk-import.** The
+Unleashed, Momentum and RogueMaster are kept locally (outside this repo) as
+reference. The snippet below dates from the Windows era; use `grep` on Linux. **Port deliberately, feature by feature — do not bulk-import.** The
 standard is that this firmware works near-flawlessly, and every imported core
 patch is a place where an upstream merge can break it.
 
@@ -179,7 +184,7 @@ exactly why the core hooks land in `canvas.c` (icon *and* font lookup) and
 visibly half-applied.
 
 `upstream` is configured fetch-only (push URL is the literal `no_push`).
-Do not push to flipperdevices repos — this is a private fork.
+Do not push to flipperdevices repos — this is our own public fork.
 
 ```bash
 git fetch upstream --tags
@@ -478,13 +483,33 @@ The Flipper Build Tool (`fbt`) downloads its own ARM toolchain on first run.
 ```bash
 ./fbt                        # firmware (debug by default)
 ./fbt updater_package        # full update package for qFlipper / SD self-update
-./fbt COMPACT=1 DEBUG=0 DIST_SUFFIX=ARG-1.5.1r1 updater_package    # release build
+DIST_SUFFIX=ARG-1.5.1r2 ./fbt COMPACT=1 DEBUG=0 updater_package    # release build
 ./fbt flash_usb              # build + push over USB, device self-updates
 ./fbt flash_usb_full         # same, including resources/assets
 ```
 
 Release artifacts land in `dist/f7-C/`, debug in `dist/f7-D/`. The `.tgz` is
 what qFlipper's "Install from file" accepts.
+
+## Releases and CI
+
+- **CI:** `.github/workflows/argus_build.yml` builds `COMPACT=1 DEBUG=0
+  updater_package` on `ubuntu-latest` (fbt fetches its toolchain) for pushes
+  to `main`, `ARG-*` tags and pull requests, and keeps the `.tgz`, the full
+  `.dfu` and `SHA256SUMS` as an artifact. Actions are pinned by commit
+  hash. The other workflows are upstream's; they need Flipper's
+  self-hosted runners and stay `workflow_dispatch`-only.
+- **Releasing:** tag `ARG-<upstream>r<N>` on `main` first (the version string
+  comes from that tag), then build with `nice -n 15` and
+  `DIST_SUFFIX=<tag>`, in a folder whose path holds no user name, since
+  the firmware embeds some source paths. Attach only
+  `flipper-z-f7-update-<tag>.tgz`, `flipper-z-f7-full-<tag>.dfu` and
+  `SHA256SUMS`. Never attach the SDK zip, the `.elf` or the `.json` files:
+  they carry build paths. Before uploading, scan the assets (and the
+  unpacked `.tgz`) for user names, `/home/`, host names and e-mail
+  addresses.
+- Release notes say the firmware is unofficial and not affiliated with
+  Flipper Devices.
 
 ## Things that will bite you
 

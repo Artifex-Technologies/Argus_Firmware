@@ -7,14 +7,40 @@ Custom [Flipper Zero](https://flipper.net) firmware, forked from the
 > [GNU GPLv3](/LICENSE). All credit for the original platform, OS and
 > application framework goes to [Flipper Devices](https://flipper.net).
 
-## Part of the Chymaera ecosystem
+> **Unofficial.** Argus is an independent project. It is not affiliated with,
+> endorsed by or supported by Flipper Devices Inc. Do not report Argus bugs
+> to Flipper Devices.
+
+## Download
+
+Prebuilt release packages are on the
+[Releases page](https://github.com/Artifex-Technologies/Argus_Firmware/releases).
+Each release has:
+
+- `flipper-z-f7-update-ARG-<version>.tgz` — the update package. Install it
+  with qFlipper or [Argus App](https://github.com/Artifex-Technologies/Argus_App):
+  connect the Flipper, choose *Install from file*, pick the `.tgz`.
+- `flipper-z-f7-full-ARG-<version>.dfu` — the raw firmware image, for
+  recovery through DFU mode only. It holds no SD-card resources, so prefer
+  the `.tgz`.
+- `SHA256SUMS` — check your download with `sha256sum -c SHA256SUMS`.
+
+Going back to stock firmware is always possible: install the official
+release from qFlipper or [lab.flipper.net](https://lab.flipper.net).
+Your settings, level and pairings survive both ways (see *Installing*).
+
+Every push to `main` is also built by GitHub Actions
+([`argus_build.yml`](/.github/workflows/argus_build.yml)); the run's
+artifact holds the same files for that commit.
+
+## Part of the Artifex ecosystem
 
 | Component | Role |
 | --- | --- |
 | **Argus Firmware** | this repo — runs on the Flipper Zero |
-| **Argus App** | desktop control app (qFlipper fork, Qt6) |
-| **Chymaera OS** | Arch-based security distro hosting the app and Sarina |
-| **Sarina** | local-model agent shipped in Chymaera OS |
+| **[Argus App](https://github.com/Artifex-Technologies/Argus_App)** | desktop control app (qFlipper fork, Qt 6) |
+| **LykanOS** | Arch-based security distro hosting the app and Sarina |
+| **Sarina** | local-model agent that reads captures through Argus App's control API |
 
 The device stays fully usable from **stock qFlipper** — that is a hard
 requirement. Argus App is the primary client and adds capability on
@@ -50,7 +76,7 @@ Via external hardware on the GPIO header:
 
 ### Streaming
 
-Telemetry is intended to reach Chymaera OS over **Bluetooth**. The RPC
+Telemetry is intended to reach LykanOS over **Bluetooth**. The RPC
 layer is transport-agnostic, so the same protobuf session runs over USB or
 BLE. The BLE serial link tops out somewhere around **5–30 KB/s**, which is
 the governing design constraint: the device emits decoded events and decimated
@@ -63,10 +89,11 @@ session outright rather than degrading silently.
 
 ## Status
 
-Builds cleanly and installs through qFlipper. Verified on hardware:
+The current release is **`ARG-1.5.1r2`**, based on Flipper's 1.5.1 release.
+It builds cleanly and installs through qFlipper. Verified on hardware:
 
 ```
-firmware.version     : ARG-1.5.1r1
+firmware.version     : ARG-1.5.1r2
 firmware.origin.fork : Argus
 firmware.api         : 88.2      (same as upstream, so official catalog apps install)
 radio.alive          : true
@@ -100,7 +127,7 @@ The NFC system dictionary is also extended to 4,479 MIFARE Classic keys
 (the union of Unleashed's and Momentum's), so more cards dump completely and
 emulate.
 
-Not shipped yet: the live Bluetooth streaming to Chymaera OS described above.
+Not shipped yet: the live Bluetooth streaming to LykanOS described above.
 Today the Argus App pulls the apps' CSV capture files off the SD card over the
 standard RPC storage link instead.
 
@@ -138,9 +165,11 @@ git clone --recursive https://github.com/Artifex-Technologies/Argus_Firmware.git
 ```shell
 ./fbt                                                  # debug firmware
 ./fbt COMPACT=1 DEBUG=0 updater_package                # release update package
+DIST_SUFFIX=ARG-1.5.1r2 ./fbt COMPACT=1 DEBUG=0 updater_package   # as the releases are named
 ```
 
-Release artifacts land in `dist/f7-C/`, debug in `dist/f7-D/`.
+Release artifacts land in `dist/f7-C/`, debug in `dist/f7-D/`. The first
+run downloads the toolchain into `toolchain/`.
 
 ## Installing
 
@@ -183,9 +212,9 @@ info device
 
 ### Version numbers
 
-`ARG-1.5.1r1` reads as **ARG**, then the upstream Flipper release this is
-based on (**1.5.1**), then our revision of it (**r1**). A revision keeps its
-name while it is being worked on: every build reads `ARG-1.5.1r1` until `r2`
+`ARG-1.5.1r2` reads as **ARG**, then the upstream Flipper release this is
+based on (**1.5.1**), then our revision of it (**r2**). A revision keeps its
+name while it is being worked on: every build reads `ARG-1.5.1r2` until `r3`
 is tagged. A new upstream release restarts at `r1` (`ARG-1.5.2r1`). To tell
 two builds of the same revision apart, use `firmware.commit.hash`.
 
@@ -224,7 +253,7 @@ hand.
 ## Project structure
 
 - `applications`        - Applications and services used in firmware
-- `applications_user`   - Argus applications live here (`ble_toolkit`, `rf_monitor`, `mfkey`, `ld2450_radar`, `wifi_scanner`)
+- `applications_user`   - Argus applications live here (`ble_toolkit`, `rf_monitor`, `mfkey`, `ld2450_radar`, `wifi_scanner`, and the imported detectors `subghz_jammer_detect`, `cerberus`, `nfc_canary`, `specter`)
 - `assets`              - Assets used by applications and services
 - `documentation`       - Documentation generation system configs and input files
 - `furi`                - Furi Core: OS-level primitives and helpers
@@ -236,3 +265,5 @@ hand.
 ## License
 
 GNU GPLv3, inherited from upstream flipperzero-firmware. See [LICENSE](/LICENSE).
+Flipper Zero is a trademark of Flipper Devices Inc.; it is used here only to
+say which device this firmware runs on.
