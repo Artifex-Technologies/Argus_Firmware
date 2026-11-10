@@ -501,13 +501,15 @@ what qFlipper's "Install from file" accepts.
   self-hosted runners and stay `workflow_dispatch`-only.
 - **Releasing:** tag `ARG-<upstream>r<N>` on `main` first (the version string
   comes from that tag), then build with `nice -n 15` and
-  `DIST_SUFFIX=<tag>`, in a folder whose path holds no user name, since
-  the firmware embeds some source paths. Attach only
-  `flipper-z-f7-update-<tag>.tgz`, `flipper-z-f7-full-<tag>.dfu` and
-  `SHA256SUMS`. Never attach the SDK zip, the `.elf` or the `.json` files:
-  they carry build paths. Before uploading, scan the assets (and the
-  unpacked `.tgz`) for user names, `/home/`, host names and e-mail
-  addresses.
+  `DIST_SUFFIX=<tag>`, in a folder whose path holds no user name. Attach
+  only `flipper-z-f7-update-<tag>.tgz`, `flipper-z-f7-full-<tag>.dfu` and
+  `SHA256SUMS`. Never attach the `.elf` or the SDK zip (which holds the
+  `.elf`): its debug info carries the build folder's path hundreds of
+  times. The `.tgz`, `.dfu` and the built SD resources held no build path
+  in the r2 scan. Before uploading, scan the assets (and the unpacked
+  `.tgz`) for user names, `/home/`, host names and e-mail addresses; the
+  update package's tar headers are already sanitised (owner `furippa`,
+  time 0).
 - Release notes say the firmware is unofficial and not affiliated with
   Flipper Devices.
 
