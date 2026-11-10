@@ -134,8 +134,12 @@ static bool flipper_application_process_manifest_section(
         return true;
     }
 
+    // Argus: read only what the struct holds. Reading `size` (the section's length, taken from the app file) let an app
+    // with a larger .fapmeta section write past the manifest into firmware memory. Found 2026-11-09 by Argus App's
+    // extractor; also present upstream.
     return storage_file_seek(file, offset, true) &&
-           storage_file_read(file, manifest, size) == size;
+           storage_file_read(file, manifest, sizeof(FlipperApplicationManifest)) ==
+               sizeof(FlipperApplicationManifest);
 }
 
 // we can't use const char* as context because we will lose the const qualifier
