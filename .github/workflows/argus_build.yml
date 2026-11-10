@@ -1,0 +1,57 @@
+name: 'Argus build'
+
+# Builds the release firmware with fbt on GitHub's own runners and keeps the update package.
+# fbt downloads its own ARM toolchain, so the runner needs nothing installed.
+# The upstream workflows next to this one need Flipper's self-hosted runners and stay manual-only.
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'ARG-*'
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: argus-build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      DIST_SUFFIX: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'ci' }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0, pinned by commit
+        with:
+          # The version string comes from the nearest ARG-<upstream>r* tag, so tags and history are needed.
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Build the update package
+        run: ./fbt COMPACT=1 DEBUG=0 updater_package
+
+      - name: Check the version and write checksums
+        run: |
+          set -euo pipefail
+          cd dist/f7-C
+          ls -la
+          test -f "flipper-z-f7-update-${DIST_SUFFIX}.tgz"
+          test -f "flipper-z-f7-full-${DIST_SUFFIX}.dfu"
+          sha256sum "flipper-z-f7-update-${DIST_SUFFIX}.tgz" "flipper-z-f7-full-${DIST_SUFFIX}.dfu" | tee SHA256SUMS
+
+      - name: Upload the update package
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2, pinned by commit
+        with:
+          name: argus-firmware-${{ env.DIST_SUFFIX }}
+          path: |
+            dist/f7-C/flipper-z-f7-update-${{ env.DIST_SUFFIX }}.tgz
+            dist/f7-C/flipper-z-f7-full-${{ env.DIST_SUFFIX }}.dfu
+            dist/f7-C/SHA256SUMS
+          if-no-files-found: error
+          retention-days: 30
